@@ -1,0 +1,2276 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Flight Schedules API",
+    "description": "## Introduction\nThe Schedules APIs, part of the [FlightStats APIs](/apis/flightstats-apis/overview), delivers access to the schedule information for upcoming flights. Responses are delivered in multiple languages, as either an XML or JSON response type. The web service features convenient search methods by flight, route, and airport to compliment our real-time FlightStatus API.\n\nSchedules APIs answer questions such as:\n* What are all the scheduled flights arriving or departing an airport on a date?\n* What are all the scheduled flights for a carrier and flight number on a date?\n* What are all the scheduled flights between two airports on a date?\n\nThe categories of Schedule APIs include:\n* By airport - Flights departing from or arriving at a specific airport on a given date in the future\n* By flight - Status for a particular flight on a given date in the future\n* By route - Flights on a route (departure & arrival airport pair) departing/arriving on a given date\n\n## Extended options\nBesides the normal [extended options](/apis/flightstats-apis/get-started), the Schedules APIs support:\n* includeDirects - Includes direct flights (flights with intermediate stops) that would otherwise be omitted from the results\n* includeCargo - Includes cargo only flights that would otherwise be omitted from the results\n* includeSurface - Includes scheduled surface transportation that would otherwise be omitted from the results\n\n## Licensing\nScheduled Flights by flight APIs are standard APIs and included in our Commercial and Contract plans. \n\nScheduled Flights by route and airport are premium APIs and only available in the Contract plan. \n\nA breakdown of the available plans is available on [Get evaluation account](/apis/flightstats-apis/get-evaluation-account#)\n\n## Schemas\nClick the download button at the top of this document to download the OpenApi spec for this API. Other schemas:\n\nLong term support \n* SOAP (deprecated) - [WSDL](https://api.flightstats.com/flex/schedules/docs/v1/lts/soap/scheduledFlightsService.wsdl) [XSD](https://api.flightstats.com/flex/schedules/docs/v1/lts/soap/scheduledFlightsService.xsd)\n* REST - [WADL](https://api.flightstats.com/flex/schedules/docs/v1/lts/rest/scheduledFlightsService.wadl) [XSD](https://api.flightstats.com/flex/schedules/docs/v1/lts/rest/scheduledFlightsService.xsd)\n\nExtended fields\n* SOAP (deprecated) - [WSDL+XSD](https://api.flightstats.com/flex/schedules/soap/v1/scheduledFlightsService?wsdl)\n* REST - [WADL](https://api.flightstats.com/flex/schedules/rest/v1/schema/wadl) [XSD](https://api.flightstats.com/flex/schedules/rest/v1/schema/xsd) [JSON](https://api.flightstats.com/flex/schedules/rest/v1/schema/json)\n\n## Related articles\n[Codeshares and wet lease relationships](/apis/data/codeshare-and-wet-lease-relationships) - Explanation of codeshares and wet lease relationships\n\n## Similar APIs \n[Connections](/apis/flightstats-apis/connections) - Connections returns schedules for connecting flights between two airports\n\n[Flight Status](/apis/flightstats-apis/flight-status) - Current flight information for flights about three days in advance of departure until about seven days after arrival\n",
+    "termsOfService": "https://www.flightstats.com/company/legal/terms-of-use/",
+    "contact": {
+      "name": "Cirium Help Desk",
+      "url": "https://helpdesk.cirium.com/"
+    },
+    "version": "138"
+  },
+  "servers": [
+    {
+      "url": "https://api.flightstats.com/",
+      "description": "Cirium Flex API Endpoint"
+    }
+  ],
+  "security": [
+    {
+      "appIdQueryParam": [],
+      "appKeyQueryParam": []
+    },
+    {
+      "appIdHeader": [],
+      "appKeyHeader": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "By airport",
+      "description": "Scheduled Flights By Airport"
+    },
+    {
+      "name": "By flight",
+      "description": "Scheduled Flights By Flight"
+    },
+    {
+      "name": "By route",
+      "description": "Scheduled Flights By Route"
+    }
+  ],
+  "paths": {
+    "/flex/schedules/rest/v1/{format}/to/{arrivalAirportCode}/arriving/{year}/{month}/{day}/{hourOfDay}": {
+      "get": {
+        "tags": [
+          "By airport"
+        ],
+        "summary": "Airport by arrival",
+        "description": "Scheduled Flight(s) arriving at the given airport at the given date\nand hour\n",
+        "operationId": "byAirportByArrival",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "path",
+            "description": "The data format returned in the response",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "json",
+              "enum": [
+                "json",
+                "jsonp",
+                "xml"
+              ]
+            }
+          },
+          {
+            "name": "arrivalAirportCode",
+            "in": "path",
+            "description": "The airport code of the arrival airport",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "PSP"
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 2022
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month",
+            "required": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 10
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "Day of month",
+            "required": true,
+            "schema": {
+              "maximum": 31,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 1
+            }
+          },
+          {
+            "name": "hourOfDay",
+            "in": "path",
+            "description": "Hour of day",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 14
+            }
+          },
+          {
+            "name": "codeType",
+            "in": "query",
+            "description": "Airport code type. If not specified, the code searches in the order: IATA, ICAO, FS.",
+            "schema": {
+              "type": "string",
+              "example": "FS",
+              "enum": [
+                "IATA",
+                "ICAO",
+                "FS"
+              ]
+            }
+          },
+          {
+            "name": "extendedOptions",
+            "in": "query",
+            "description": "[Extended options](/apis/flightstats-apis/get-started) for modifying standard API behavior to fit special use cases",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "useHttpErrors",
+                  "useInlinedReferences",
+                  "includeCargo",
+                  "includeDirects",
+                  "includeNewFields",
+                  "languageCode:en",
+                  "languageCode:ar",
+                  "languageCode:de",
+                  "languageCode:es",
+                  "languageCode:fr",
+                  "languageCode:ja",
+                  "languageCode:ko",
+                  "languageCode:pt",
+                  "languageCode:zh"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of schedule flights.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client request error. Consult error response for specifics.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization failure. Invalid 'appId', 'appKey', or rate limit violation.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested item could not be found, or the endpoint does not exist.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "API application error. If error is consistent, please contact Cirium Support.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flex/schedules/rest/v1/{format}/from/{departureAirportCode}/departing/{year}/{month}/{day}/{hourOfDay}": {
+      "get": {
+        "tags": [
+          "By airport"
+        ],
+        "summary": "Airport by departure",
+        "description": "Scheduled Flight(s) departing from the given airport at the given\ndate and hour\n",
+        "operationId": "byAirportByDeparture",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "path",
+            "description": "The data format returned in the response",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "json",
+              "enum": [
+                "json",
+                "jsonp",
+                "xml"
+              ]
+            }
+          },
+          {
+            "name": "departureAirportCode",
+            "in": "path",
+            "description": "The airport code of the departure airport.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "PDX"
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 2022
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month",
+            "required": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 10
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "Day of month",
+            "required": true,
+            "schema": {
+              "maximum": 31,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 1
+            }
+          },
+          {
+            "name": "hourOfDay",
+            "in": "path",
+            "description": "Hour of day",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 14
+            }
+          },
+          {
+            "name": "codeType",
+            "in": "query",
+            "description": "Airport code type. If not specified, the code searches in the order: IATA, ICAO, FS.",
+            "schema": {
+              "type": "string",
+              "example": "FS",
+              "enum": [
+                "IATA",
+                "ICAO",
+                "FS"
+              ]
+            }
+          },
+          {
+            "name": "extendedOptions",
+            "in": "query",
+            "description": "[Extended options](/apis/flightstats-apis/get-started) for modifying standard API behavior to fit special use cases",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "useHttpErrors",
+                  "useInlinedReferences",
+                  "includeCargo",
+                  "includeDirects",
+                  "includeNewFields",
+                  "languageCode:en",
+                  "languageCode:ar",
+                  "languageCode:de",
+                  "languageCode:es",
+                  "languageCode:fr",
+                  "languageCode:ja",
+                  "languageCode:ko",
+                  "languageCode:pt",
+                  "languageCode:zh"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of schedule flights.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                },
+                "examples": {
+                  "Flight Schedule By Flight Departure": {
+                    "description": "Schedule response for by flight with default options (this is by arrival but the response is the same)",
+                    "externalValue": "https://developer.cirium.com/link-proxy?https://api.flightstats.com/flex/schedules/samples/v1/scheduled_flights_response.json"
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                },
+                "examples": {
+                  "Flight Schedule By Flight Departure": {
+                    "description": "Schedule response for by flight with default options (this is by arrival but the response is the same)",
+                    "externalValue": "https://developer.cirium.com/link-proxy?https://api.flightstats.com/flex/schedules/samples/v1/scheduled_flights_response.xml"
+                  }
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client request error. Consult error response for specifics.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization failure. Invalid 'appId', 'appKey', or rate limit violation.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested item could not be found, or the endpoint does not exist.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "API application error. If error is consistent, please contact Cirium Support.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flex/schedules/rest/v1/{format}/flight/{carrier}/{flightNumber}/arriving/{year}/{month}/{day}": {
+      "get": {
+        "tags": [
+          "By flight"
+        ],
+        "summary": "Flight by arrival",
+        "description": "Scheduled Flight(s) by carrier and flight number, arriving on the\ngiven date\n",
+        "operationId": "byFlightByArrival",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "path",
+            "description": "The data format returned in the response",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "json",
+              "enum": [
+                "json",
+                "jsonp",
+                "xml"
+              ]
+            }
+          },
+          {
+            "name": "carrier",
+            "in": "path",
+            "description": "Carrier (airline) code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "AS"
+          },
+          {
+            "name": "flightNumber",
+            "in": "path",
+            "description": "Flight number",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 412
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 2022
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month",
+            "required": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 10
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "Day of month",
+            "required": true,
+            "schema": {
+              "maximum": 31,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 1
+            }
+          },
+          {
+            "name": "codeType",
+            "in": "query",
+            "description": "Airport code type. If not specified, the code searches in the order: IATA, ICAO, FS.",
+            "schema": {
+              "type": "string",
+              "example": "FS",
+              "enum": [
+                "IATA",
+                "ICAO",
+                "FS"
+              ]
+            }
+          },
+          {
+            "name": "extendedOptions",
+            "in": "query",
+            "description": "[Extended options](/apis/flightstats-apis/get-started) for modifying standard API behavior to fit special use cases",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "useHttpErrors",
+                  "useInlinedReferences",
+                  "includeCargo",
+                  "includeDirects",
+                  "includeNewFields",
+                  "languageCode:en",
+                  "languageCode:ar",
+                  "languageCode:de",
+                  "languageCode:es",
+                  "languageCode:fr",
+                  "languageCode:ja",
+                  "languageCode:ko",
+                  "languageCode:pt",
+                  "languageCode:zh"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of schedule flights.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                },
+                "examples": {
+                  "Flight Schedule By Flight Arrival": {
+                    "description": "Schedule response for by flight arrival with default options",
+                    "externalValue": "https://developer.cirium.com/link-proxy?https://api.flightstats.com/flex/schedules/samples/v1/scheduled_flights_response.json"
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                },
+                "examples": {
+                  "Flight Schedule By Flight Arrival": {
+                    "description": "Schedule response for by flight arrival with default options",
+                    "externalValue": "https://developer.cirium.com/link-proxy?https://api.flightstats.com/flex/schedules/samples/v1/scheduled_flights_response.xml"
+                  }
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client request error. Consult error response for specifics.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization failure. Invalid 'appId', 'appKey', or rate limit violation.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested item could not be found, or the endpoint does not exist.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "API application error. If error is consistent, please contact Cirium Support.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flex/schedules/rest/v1/{format}/flight/{carrier}/{flightNumber}/departing/{year}/{month}/{day}": {
+      "get": {
+        "tags": [
+          "By flight"
+        ],
+        "summary": "Flight by departure",
+        "description": "Scheduled Flight(s) by carrier and flight number, departing on the\ngiven date\n",
+        "operationId": "byFlightByDeparture",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "path",
+            "description": "The data format returned in the response",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "json",
+              "enum": [
+                "json",
+                "jsonp",
+                "xml"
+              ]
+            }
+          },
+          {
+            "name": "carrier",
+            "in": "path",
+            "description": "Carrier (airline) code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "AS"
+          },
+          {
+            "name": "flightNumber",
+            "in": "path",
+            "description": "Flight number",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "example": 412
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 2022
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month (1 to 12)",
+            "required": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 10
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "Day of month",
+            "required": true,
+            "schema": {
+              "maximum": 31,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 1
+            }
+          },
+          {
+            "name": "codeType",
+            "in": "query",
+            "description": "Airport code type. If not specified, the code searches in the order: IATA, ICAO, FS.",
+            "schema": {
+              "type": "string",
+              "example": "FS",
+              "enum": [
+                "IATA",
+                "ICAO",
+                "FS"
+              ]
+            }
+          },
+          {
+            "name": "extendedOptions",
+            "in": "query",
+            "description": "[Extended options](/apis/flightstats-apis/get-started) for modifying standard API behavior to fit special use cases",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "useHttpErrors",
+                  "useInlinedReferences",
+                  "includeCargo",
+                  "includeDirects",
+                  "includeNewFields",
+                  "languageCode:en",
+                  "languageCode:ar",
+                  "languageCode:de",
+                  "languageCode:es",
+                  "languageCode:fr",
+                  "languageCode:ja",
+                  "languageCode:ko",
+                  "languageCode:pt",
+                  "languageCode:zh"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of schedule flights.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client request error. Consult error response for specifics.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization failure. Invalid 'appId', 'appKey', or rate limit violation.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested item could not be found, or the endpoint does not exist.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "API application error. If error is consistent, please contact Cirium Support.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flex/schedules/rest/v1/{format}/from/{departureAirportCode}/to/{arrivalAirportCode}/arriving/{year}/{month}/{day}": {
+      "get": {
+        "tags": [
+          "By route"
+        ],
+        "summary": "Route by arrival",
+        "description": "Scheduled Flight(s) by route, arriving on the given date\n",
+        "operationId": "byRouteByArrival",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "path",
+            "description": "The data format returned in the response",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "json",
+              "enum": [
+                "json",
+                "jsonp",
+                "xml"
+              ]
+            }
+          },
+          {
+            "name": "departureAirportCode",
+            "in": "path",
+            "description": "The airport code of the departure airport",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "PDX"
+          },
+          {
+            "name": "arrivalAirportCode",
+            "in": "path",
+            "description": "The airport code of the arrival airport",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "PSP"
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 2022
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month",
+            "required": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 10
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "Day of month",
+            "required": true,
+            "schema": {
+              "maximum": 31,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 1
+            }
+          },
+          {
+            "name": "codeType",
+            "in": "query",
+            "description": "Airport code type. If not specified, the code searches in the order: IATA, ICAO, FS.",
+            "schema": {
+              "type": "string",
+              "example": "FS",
+              "enum": [
+                "IATA",
+                "ICAO",
+                "FS"
+              ]
+            }
+          },
+          {
+            "name": "extendedOptions",
+            "in": "query",
+            "description": "[Extended options](/apis/flightstats-apis/get-started) for modifying standard API behavior to fit special use cases",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "useHttpErrors",
+                  "useInlinedReferences",
+                  "includeCargo",
+                  "includeDirects",
+                  "includeNewFields",
+                  "languageCode:en",
+                  "languageCode:ar",
+                  "languageCode:de",
+                  "languageCode:es",
+                  "languageCode:fr",
+                  "languageCode:ja",
+                  "languageCode:ko",
+                  "languageCode:pt",
+                  "languageCode:zh"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of schedule flights.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client request error. Consult error response for specifics.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization failure. Invalid 'appId', 'appKey', or rate limit violation.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested item could not be found, or the endpoint does not exist.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "API application error. If error is consistent, please contact Cirium Support.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flex/schedules/rest/v1/{format}/from/{departureAirportCode}/to/{arrivalAirportCode}/departing/{year}/{month}/{day}": {
+      "get": {
+        "tags": [
+          "By route"
+        ],
+        "summary": "Route by departure",
+        "description": "Scheduled Flight(s) by route, departing on the given date\n",
+        "operationId": "byRouteByDeparture",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "path",
+            "description": "The data format returned in the response",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "json",
+              "enum": [
+                "json",
+                "jsonp",
+                "xml"
+              ]
+            }
+          },
+          {
+            "name": "departureAirportCode",
+            "in": "path",
+            "description": "The airport code of the departure airport",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "PDX"
+          },
+          {
+            "name": "arrivalAirportCode",
+            "in": "path",
+            "description": "The airport code of the arrival airport",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "PSP"
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 2022
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month",
+            "required": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 10
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "Day of month",
+            "required": true,
+            "schema": {
+              "maximum": 31,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64",
+              "example": 1
+            }
+          },
+          {
+            "name": "codeType",
+            "in": "query",
+            "description": "Airport code type. If not specified, the code searches in the order: IATA, ICAO, FS.",
+            "schema": {
+              "type": "string",
+              "example": "FS",
+              "enum": [
+                "IATA",
+                "ICAO",
+                "FS"
+              ]
+            }
+          },
+          {
+            "name": "extendedOptions",
+            "in": "query",
+            "description": "[Extended options](/apis/flightstats-apis/get-started) for modifying standard API behavior to fit special use cases",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "useHttpErrors",
+                  "useInlinedReferences",
+                  "includeCargo",
+                  "includeDirects",
+                  "includeNewFields",
+                  "languageCode:en",
+                  "languageCode:ar",
+                  "languageCode:de",
+                  "languageCode:es",
+                  "languageCode:fr",
+                  "languageCode:ja",
+                  "languageCode:ko",
+                  "languageCode:pt",
+                  "languageCode:zh"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of schedule flights.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client request error. Consult error response for specifics.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization failure. Invalid 'appId', 'appKey', or rate limit violation.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested item could not be found, or the endpoint does not exist.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "API application error. If error is consistent, please contact Cirium Support.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "application/javascript; charset=UTF-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulesResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Airline": {
+        "type": "object",
+        "description": "The airline object contains the unique codes and name that identify a unique airline or carrier",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "example": "AS",
+            "description": "The Cirium code for the carrier, globally unique across time"
+          },
+          "iata": {
+            "type": "string",
+            "example": "AS",
+            "description": "The IATA code for the carrier"
+          },
+          "icao": {
+            "type": "string",
+            "example": "ASA",
+            "description": "The ICAO code for the carrier"
+          },
+          "name": {
+            "type": "string",
+            "example": "Alaska Airlines",
+            "description": "The name of the carrier"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "1-800-433-7300",
+            "description": "The primary customer service phone number for the carrier"
+          },
+          "active": {
+            "type": "boolean",
+            "example": true,
+            "description": "Boolean value indicating if the airline is currently active"
+          },
+          "dateFrom": {
+            "type": "string",
+            "description": "Ignore. These are currently not returned."
+          },
+          "dateTo": {
+            "type": "string",
+            "description": "Ignore. These are currently not returned."
+          },
+          "category": {
+            "type": "string",
+            "description": "The category of operation of the airline:\n- A - Scheduled Passenger Carrier\n- B - Non-Scheduled Passenger Carrier\n- C - Scheduled Cargo Carrier\n- D - Non-Scheduled Cargo Carrier\n- E - Railway Company\n- F - Ferry Company\n- G - Non-airline ULD (Cargo)\n- H - Computer Reservation System\n- I - Scheduled Passenger/Cargo Carrier\n- J - Non-scheduled Passenger/Cargo Carrier\n- K - Bus Company\n- S - Miscellaneous/Other\n"
+          }
+        },
+        "nullable": true
+      },
+      "Airport": {
+        "type": "object",
+        "description": "The airport object contains the unique codes and name that identify a unique airport",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "example": "PDX",
+            "description": "The Cirium code for the airport, globally unique across time"
+          },
+          "iata": {
+            "type": "string",
+            "example": "PDX",
+            "description": "The IATA code for the airport"
+          },
+          "icao": {
+            "type": "string",
+            "example": "KPDX",
+            "description": "The ICAO code for the airport"
+          },
+          "faa": {
+            "type": "string",
+            "example": "PDX",
+            "description": "The FAA code for the airport"
+          },
+          "name": {
+            "type": "string",
+            "example": "Portland International Airport",
+            "description": "The name of the airport"
+          },
+          "street1": {
+            "type": "string",
+            "example": "7000 NE Airport Way",
+            "description": "The street address of the airport, part 1"
+          },
+          "street2": {
+            "type": "string",
+            "description": "The street address of the airport, part 2"
+          },
+          "city": {
+            "type": "string",
+            "example": "Portland",
+            "description": "The city in which the airport resides"
+          },
+          "cityCode": {
+            "type": "string",
+            "example": "PDX",
+            "description": "The code of the city in which the airport resides"
+          },
+          "stateCode": {
+            "type": "string",
+            "example": "OR",
+            "description": "The State in which the airport resides"
+          },
+          "postalCode": {
+            "type": "string",
+            "example": "97218",
+            "description": "The postal code in which the airport resides"
+          },
+          "countryCode": {
+            "type": "string",
+            "example": "US",
+            "description": "The code for the country in which the airport resides"
+          },
+          "district": {
+            "type": "string",
+            "description": "The district of the city in which the airport resides. Returned if specifying includeNewFields in extendedOptions."
+          },
+          "countryName": {
+            "type": "string",
+            "example": "United States",
+            "description": "The name of the country in which the Airport resides"
+          },
+          "regionName": {
+            "type": "string",
+            "example": "North America",
+            "description": "The name of the region in which the Airport resides"
+          },
+          "timeZoneRegionName": {
+            "type": "string",
+            "example": "America/Los_Angeles",
+            "description": "The name of the Time Zone region in which the Airport resides"
+          },
+          "weatherZone": {
+            "type": "string",
+            "example": "ORZ006",
+            "description": "The NOAA weather zone (US only) in which the Airport resides"
+          },
+          "localTime": {
+            "type": "string",
+            "example": "2020-01-01T00:00:00.000",
+            "description": "The local time at the Airport in ISO-8601 format. yyyy-MM-dd'T'HH:mm:ss.SSS."
+          },
+          "utcOffsetHours": {
+            "type": "number",
+            "format": "float",
+            "example": -8,
+            "description": "The current UTC offset at the Airport"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float",
+            "example": 45.588995,
+            "description": "The latitude of the airport in decimal degrees"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float",
+            "example": -122.592901,
+            "description": "The longitude of the airport in decimal degrees"
+          },
+          "elevationFeet": {
+            "type": "integer",
+            "format": "int32",
+            "example": 30,
+            "description": "The elevation above sea level of the airport in feet"
+          },
+          "classification": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1,
+            "description": "The Cirium classification of the size of the airport, 1(max) to 5(min)"
+          },
+          "active": {
+            "type": "boolean",
+            "example": true,
+            "description": "Boolean value indicating if the airport is currently operational"
+          },
+          "dateFrom": {
+            "type": "string",
+            "description": "Ignore. These are not returned."
+          },
+          "dateTo": {
+            "type": "string",
+            "description": "Ignore. These are not returned."
+          },
+          "weatherUrl": {
+            "type": "string",
+            "example": "https://api.flightstats.com/flex/weather/rest/v1/json/all/PDX?codeType=fs",
+            "description": "URL for the Weather service with current weather data for the Airport"
+          },
+          "delayIndexUrl": {
+            "type": "string",
+            "example": "https://api.flightstats.com/flex/delayindex/rest/v1/json/airports/PDX?codeType=fs",
+            "description": "URL for the DelayIndex service with current delay information computed for the Airport"
+          }
+        },
+        "nullable": true
+      },
+      "ApiResponseError": {
+        "type": "object",
+        "description": "In the default case, when an error occurs the API returns a 200 status code and this structure contains information about the error. Not returned if specifying _extendedOptions=useHTTPErrors_, in which case the API returns the HTTP error code and _text/plain_ body containing the same information as in the structure.",
+        "properties": {
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32",
+            "example": 400,
+            "description": "This is the standard HTTP code (400, 401, 404, etc...)"
+          },
+          "errorId": {
+            "type": "string",
+            "example": "4d1c06b9-f999-4fd6-81fd-9a7d1cd5768f",
+            "description": "This is a unique identifier for the error used internally at Cirium. Include this string in helpdesk requests to help us troubleshoot issues."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "This contains detail about the error. If there are multiple errors in the request, the string may have multiple items separated by a '|' character.",
+            "example": "Invalid value for carrier: AAAA|Invalid value for date: 1969-02-02 - The date specified is not within the expected range. Earliest allowed date '2021-08-23'"
+          },
+          "errorCode": {
+            "type": "string",
+            "example": "BAD_REQUEST"
+          }
+        }
+      },
+      "AppendixWithWrapper": {
+        "type": "object",
+        "description": "The response includes this appendix unless specifying _useInlinedReferences_ in _extendedOptions_. For every airline, airport, or equipment code included in the response, the appendix includes the associated airport, airline or equipment that fully describes the airport, airline or equipment. The _appendix_ includes an array of airlines, airports or amd equipment if there is at least one of those types in the response.",
+        "properties": {
+          "airlines": {
+            "uniqueItems": true,
+            "type": "array",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "$ref": "#/components/schemas/Airline"
+            }
+          },
+          "airports": {
+            "uniqueItems": true,
+            "type": "array",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "$ref": "#/components/schemas/Airport"
+            }
+          },
+          "equipments": {
+            "uniqueItems": true,
+            "type": "array",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "$ref": "#/components/schemas/Equipment"
+            }
+          }
+        }
+      },
+      "Equipment": {
+        "type": "object",
+        "description": "Describes the aircraft",
+        "properties": {
+          "iata": {
+            "type": "string",
+            "example": "72W",
+            "description": "The IATA code for the equipment type"
+          },
+          "name": {
+            "type": "string",
+            "example": "Boeing 727-200 (winglets) Passenger",
+            "description": "The descriptive name for the equipment type"
+          },
+          "turboProp": {
+            "type": "boolean",
+            "example": false,
+            "description": "Boolean value indicating if the equipment type uses TurboProp propulsion"
+          },
+          "jet": {
+            "type": "boolean",
+            "example": true,
+            "description": "Boolean value indicating if the equipment type uses jet propulsion"
+          },
+          "widebody": {
+            "type": "boolean",
+            "example": false,
+            "description": "Boolean value indicating if the equipment type is a wide-body airframe"
+          },
+          "regional": {
+            "type": "boolean",
+            "example": false,
+            "description": "Boolean value indicating if the equipment type is a regional airframe"
+          }
+        },
+        "nullable": true,
+        "xml": {
+          "name": "equipment"
+        }
+      },
+      "InputParameterInteger": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "string"
+          },
+          "interpreted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "airport": {
+            "$ref": "#/components/schemas/Airport"
+          },
+          "airline": {
+            "$ref": "#/components/schemas/Airline"
+          },
+          "equipment": {
+            "$ref": "#/components/schemas/Equipment"
+          },
+          "legacyCode": {
+            "type": "boolean"
+          },
+          "requestedCode": {
+            "type": "string"
+          },
+          "fsCode": {
+            "type": "string"
+          }
+        }
+      },
+      "InputParameterString": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "string"
+          },
+          "interpreted": {
+            "type": "string"
+          },
+          "airport": {
+            "$ref": "#/components/schemas/Airport"
+          },
+          "airline": {
+            "$ref": "#/components/schemas/Airline"
+          },
+          "equipment": {
+            "$ref": "#/components/schemas/Equipment"
+          },
+          "legacyCode": {
+            "type": "boolean"
+          },
+          "requestedCode": {
+            "type": "string"
+          },
+          "fsCode": {
+            "type": "string"
+          }
+        }
+      },
+      "InterpretedDateFields": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "string"
+          },
+          "month": {
+            "type": "string"
+          },
+          "day": {
+            "type": "string"
+          },
+          "hour": {
+            "type": "string"
+          },
+          "minute": {
+            "type": "string"
+          },
+          "interpreted": {
+            "type": "string"
+          }
+        }
+      },
+      "InterpretedRequest": {
+        "type": "object",
+        "properties": {
+          "carrier": {
+            "$ref": "#/components/schemas/InputParameterString"
+          },
+          "flightNumber": {
+            "$ref": "#/components/schemas/InputParameterString"
+          },
+          "departing": {
+            "type": "boolean"
+          },
+          "hourOfDay": {
+            "$ref": "#/components/schemas/InputParameterInteger"
+          },
+          "codeType": {
+            "$ref": "#/components/schemas/InputParameterString"
+          },
+          "url": {
+            "type": "string"
+          },
+          "airport": {
+            "$ref": "#/components/schemas/InputParameterString"
+          },
+          "departureAirport": {
+            "$ref": "#/components/schemas/InputParameterString"
+          },
+          "arrivalAirport": {
+            "$ref": "#/components/schemas/InputParameterString"
+          },
+          "date": {
+            "$ref": "#/components/schemas/InterpretedDateFields"
+          }
+        }
+      },
+      "ScheduledCodeshare": {
+        "type": "object",
+        "properties": {
+          "carrierFsCode": {
+            "type": "string",
+            "description": "The Cirium unique code for the carrier that is marketing the codeshare (this may be the operator or a codeshare partner) to use as a reference for finding the entry in the appendix."
+          },
+          "carrier": {
+            "$ref": "#/components/schemas/Airline"
+          },
+          "flightNumber": {
+            "type": "string",
+            "example": 100,
+            "description": "The flight identification number and any additional characters"
+          },
+          "serviceType": {
+            "type": "string",
+            "description": "The type of service offered for the flight:\n- J\t: Scheduled Passenger (Normal Service)\n- S\t: Scheduled Passenger (Shuttle Service)\t\n- G\t: Non-scheduled Passenger (Normal Service)\n- B\t: Non-scheduled Passenger (Shuttle Service)\n- C\t: Charter (Passenger Only)\n- O\t: Charter (Special handling - Migrants/Immigrants)\n- L\t: Charter (Passenger and Cargo and/or Mail)\n- R\t: Additional Flights - Passenger/Cargo\n- Q\t: Scheduled Passenger/Cargo in Cabin\n- F\t: Scheduled Cargo/Mail (Loose loaded cargo and/or preloaded devices)\n- M\t: Scheduled Cargo/Mail (Mail Only)\n- A\t: Non-scheduled Cargo/Mail\n- H\t: Charter (Cargo and/or Mail)\t\n- V\t: Scheduled Cargo/Mail (Surface Vehicle)\n- U\tS: cheduled Passenger (Service Vehicle)\n",
+            "example": "J"
+          },
+          "serviceClasses": {
+            "type": "array",
+            "description": "IATA [service classes](https://en.wikipedia.org/wiki/Fare_basis_code) offered for the flight.",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "serviceClass"
+              }
+            },
+            "example": "R"
+          },
+          "trafficRestrictions": {
+            "type": "array",
+            "description": "IATA restrictions imposed on the flight",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "trafficRestriction"
+              }
+            },
+            "example": "Q"
+          },
+          "referenceCode": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ScheduledFlight": {
+        "type": "object",
+        "description": "This object contains a schedule for a flight in the future",
+        "properties": {
+          "carrierFsCode": {
+            "type": "string",
+            "description": "The Cirium unique code for the operating carrier to use as a reference for finding the entry in the appendix (unless specifying useInlinedReferences in extended options)",
+            "example": "AA"
+          },
+          "carrier": {
+            "$ref": "#/components/schemas/Airline"
+          },
+          "flightNumber": {
+            "type": "string",
+            "example": 100,
+            "description": "The flight identification number and any additional characters"
+          },
+          "brand": {
+            "type": "string",
+            "description": "The brand name the flight flies under if different from the carrier name. Usually reserved for regional feeder flights like American Airlines, United Express, etc.. where the operator of these flights may be different airlines but carry the same brand.",
+            "example": "United Express"
+          },
+          "departureAirportFsCode": {
+            "type": "string",
+            "description": "The Cirium unique code for the departure airport to use as a reference for finding the entry in the appendix (unless the extended option to include inlined references is used)"
+          },
+          "departureAirport": {
+            "$ref": "#/components/schemas/Airport"
+          },
+          "arrivalAirportFsCode": {
+            "type": "string",
+            "description": "The Cirium unique code for the arrival airport to use as a reference for finding the entry in the appendix (unless the extended option to include inlined references is used)"
+          },
+          "arrivalAirport": {
+            "$ref": "#/components/schemas/Airport"
+          },
+          "departureTime": {
+            "type": "string",
+            "description": "The published departure time (local to the airport) for the flight provided by the airline's operating schedule",
+            "format": "date-time"
+          },
+          "arrivalTime": {
+            "type": "string",
+            "description": "The published arrival time (local to the airport) for the flight provided by the airline's operating schedule",
+            "format": "date-time"
+          },
+          "stops": {
+            "type": "integer",
+            "description": "The number of stops between the departure and arrival airport. This will always be 0 unless the extended option \"includeDirects\" is specified.",
+            "format": "int32",
+            "example": 0
+          },
+          "departureTerminal": {
+            "type": "string",
+            "description": "The terminal from which the flight will depart",
+            "example": 8
+          },
+          "arrivalTerminal": {
+            "type": "string",
+            "description": "The terminal from which the flight will arrive",
+            "example": 3
+          },
+          "flightEquipmentIataCode": {
+            "type": "string",
+            "description": "The IATA code for the equipment scheduled to be flown to use as a reference for finding the entry in the appendix (unless the extended option to include inlined references is used)",
+            "example": 777
+          },
+          "flightEquipment": {
+            "$ref": "#/components/schemas/Equipment"
+          },
+          "isCodeshare": {
+            "type": "boolean",
+            "description": "Boolean value indicating if the marketed flight is a codeshare",
+            "example": false
+          },
+          "isWetlease": {
+            "type": "boolean",
+            "description": "Boolean value indicating if the marketed flight is a wetlease",
+            "example": false
+          },
+          "serviceType": {
+            "type": "string",
+            "description": "The type of service offered for the flight:\n- J\t: Scheduled Passenger (Normal Service)\n- S\t: Scheduled Passenger (Shuttle Service)\t\n- G\t: Non-scheduled Passenger (Normal Service)\n- B\t: Non-scheduled Passenger (Shuttle Service)\n- C\t: Charter (Passenger Only)\n- O\t: Charter (Special handling - Migrants/Immigrants)\n- L\t: Charter (Passenger and Cargo and/or Mail)\n- R\t: Additional Flights - Passenger/Cargo\n- Q\t: Scheduled Passenger/Cargo in Cabin\n- F\t: Scheduled Cargo/Mail (Loose loaded cargo and/or preloaded devices)\n- M\t: Scheduled Cargo/Mail (Mail Only)\n- A\t: Non-scheduled Cargo/Mail\n- H\t: Charter (Cargo and/or Mail)\t\n- V\t: Scheduled Cargo/Mail (Surface Vehicle)\n- U\tS: cheduled Passenger (Service Vehicle)\n",
+            "example": "J"
+          },
+          "serviceClasses": {
+            "type": "array",
+            "description": "IATA [service classes](https://en.wikipedia.org/wiki/Fare_basis_code) offered for the flight.",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "serviceClass"
+              }
+            },
+            "example": "R"
+          },
+          "trafficRestrictions": {
+            "type": "array",
+            "description": "IATA restrictions imposed on the flight",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "trafficRestriction"
+              }
+            },
+            "example": "Q"
+          },
+          "codeshares": {
+            "type": "array",
+            "description": "Any codeshares for this operated flight. Codeshares are only possible if this flight leg is not itself a codeshare (the codeshare field must be false).",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "$ref": "#/components/schemas/ScheduledCodeshare"
+            }
+          },
+          "operator": {
+            "$ref": "#/components/schemas/ScheduledOperator"
+          },
+          "wetleaseOperator": {
+            "$ref": "#/components/schemas/Airline"
+          },
+          "wetleaseOperatorFsCode": {
+            "description": "The Cirium unique code for the operating carrier to use as a reference for finding the entry in the appendix (unless the extended option to include inlined references is used). This only appears when the marketed flight is a codeshare (isCodeshare is true).",
+            "type": "string"
+          },
+          "referenceCode": {
+            "type": "string",
+            "description": "Reference code for Cirium troubleshooting purposes",
+            "example": "708-1673128--"
+          },
+          "elapsedTime": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The flight duration in minutes. Returned if specifying includeNewFields in extendedOptions."
+          }
+        }
+      },
+      "ScheduledOperator": {
+        "description": "The operator's flight information, which appears only when the marketed flight in the schedule is a codeshare (isCodeshare is true).",
+        "type": "object",
+        "properties": {
+          "carrierFsCode": {
+            "type": "string",
+            "description": "The Cirium unique code for the carrier operating carrier to use as a reference for finding the entry in the appendix (unless the extended option 'useInlinedReferences' is used)",
+            "example": "LY"
+          },
+          "carrier": {
+            "$ref": "#/components/schemas/Airline"
+          },
+          "flightNumber": {
+            "type": "string",
+            "description": "Flight Number assigned by the operating carrier",
+            "example": 2627
+          },
+          "serviceType": {
+            "type": "string",
+            "description": "The type of service offered for the flight:\n- J\t: Scheduled Passenger (Normal Service)\n- S\t: Scheduled Passenger (Shuttle Service)\t\n- G\t: Non-scheduled Passenger (Normal Service)\n- B\t: Non-scheduled Passenger (Shuttle Service)\n- C\t: Charter (Passenger Only)\n- O\t: Charter (Special handling - Migrants/Immigrants)\n- L\t: Charter (Passenger and Cargo and/or Mail)\n- R\t: Additional Flights - Passenger/Cargo\n- Q\t: Scheduled Passenger/Cargo in Cabin\n- F\t: Scheduled Cargo/Mail (Loose loaded cargo and/or preloaded devices)\n- M\t: Scheduled Cargo/Mail (Mail Only)\n- A\t: Non-scheduled Cargo/Mail\n- H\t: Charter (Cargo and/or Mail)\t\n- V\t: Scheduled Cargo/Mail (Surface Vehicle)\n- U\tS: cheduled Passenger (Service Vehicle)\n",
+            "example": "J"
+          },
+          "serviceClasses": {
+            "type": "array",
+            "description": "IATA [service classes](https://en.wikipedia.org/wiki/Fare_basis_code) offered for the flight.",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "serviceClass"
+              }
+            },
+            "example": "R"
+          },
+          "trafficRestrictions": {
+            "type": "array",
+            "description": "IATA restrictions imposed on the flight",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "trafficRestriction"
+              }
+            },
+            "example": "Q"
+          },
+          "referenceCode": {
+            "type": "integer",
+            "description": "Reference code for Cirium troubleshooting purposes.",
+            "format": "int64",
+            "example": 10418424
+          }
+        }
+      },
+      "SchedulesResponse": {
+        "type": "object",
+        "description": "The response body includes the following:\n- InterpretedRequest - The API returns the information you requested, plus any interpretation of your request (for example, it will show you the FlightStats code for an airline or airport that it is using and that may be different than the IATA or ICAO code provided)\n- APIResponseError - If there is an error, the response includes this error object describing the problem\n- AppendixWithWrapper - If _useInlinedReferences_ is not provided and the result includes one or more flights, the response includes \nand appendix of airline, airport, and equipment objects\n- ScheduledFlights - An array of ScheduledFlight elements\n",
+        "properties": {
+          "request": {
+            "$ref": "#/components/schemas/InterpretedRequest"
+          },
+          "error": {
+            "$ref": "#/components/schemas/ApiResponseError"
+          },
+          "scheduledFlights": {
+            "type": "array",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "$ref": "#/components/schemas/ScheduledFlight"
+            }
+          },
+          "appendix": {
+            "$ref": "#/components/schemas/AppendixWithWrapper"
+          }
+        },
+        "xml": {
+          "name": "response"
+        }
+      }
+    },
+    "securitySchemes": {
+      "appIdQueryParam": {
+        "type": "apiKey",
+        "description": "ID of the application making the request",
+        "name": "appId",
+        "in": "query"
+      },
+      "appKeyQueryParam": {
+        "type": "apiKey",
+        "description": "Authentication key of the application making the request",
+        "name": "appKey",
+        "in": "query"
+      },
+      "appIdHeader": {
+        "type": "apiKey",
+        "description": "ID of the application making the request",
+        "name": "appId",
+        "in": "header"
+      },
+      "appKeyHeader": {
+        "type": "apiKey",
+        "description": "Authentication key of the application making the request",
+        "name": "appKey",
+        "in": "header"
+      }
+    }
+  }
+}
