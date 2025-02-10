@@ -19,6 +19,7 @@ function App() {
   const [currentTime, setCurrentTime] = useState(''); // Güncel saati tutar
   const [isLoading, setIsLoading] = useState(true); // Yükleme durumunu kontrol eder
   const [error, setError] = useState<string | null>(null); // Hata mesajlarını tutar
+  const [lastUpdate, setLastUpdate] = useState('');
 
   // Saat güncelleme efekti - Her saniye çalışır
   useEffect(() => {
@@ -44,33 +45,31 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Uçuş verilerini yükleme efekti - İlk yüklemede ve her 10 dakikada bir çalışır
+  // Uçuş verilerini yükleme efekti - İlk yüklemede ve her 5 dakikada bir çalışır
   useEffect(() => {
     let mounted = true;
 
     const loadFlights = async () => {
       try {
-        setIsLoading(true);
         setError(null);
+        setIsLoading(true);
         const data = await fetchFlights();
         if (mounted) {
           setFlightData(data);
+          setLastUpdate(new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false }));
+          setIsLoading(false);
         }
-      } catch (error) {
+      } catch (err) {
         if (mounted) {
-          setError('Uçuş verileri yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.');
-          console.error('Uçuş verileri yüklenirken hata:', error);
-        }
-      } finally {
-        if (mounted) {
+          setError('Uçuş verileri yüklenirken bir hata oluştu.');
           setIsLoading(false);
         }
       }
     };
 
     loadFlights();
-    const interval = setInterval(loadFlights, 600000);
-
+    const interval = setInterval(loadFlights, 300000); // 5 dakika (300000 ms)
+    
     return () => {
       mounted = false;
       clearInterval(interval);
@@ -126,7 +125,7 @@ function App() {
           {/* Sağ taraf - Saat ve son güncelleme zamanı */}
           <div className="text-right">
             <div className="text-6xl font-semibold tracking-tight">{currentTime}</div>
-            <div className="text-lg text-slate-400 mt-2">Son Güncelleme: {flightData.lastUpdated}</div>
+            <div className="text-lg text-slate-400 mt-2">Son Güncelleme: {lastUpdate}</div>
           </div>
         </div>
       </header>
@@ -146,28 +145,28 @@ function App() {
           <div className="overflow-auto rounded-xl border border-slate-700/50">
             <table className="w-full text-left">
               {/* Tablo başlığı */}
-              <thead className="bg-[#1E293B]/50 backdrop-blur-lg text-2xl uppercase border-b border-slate-700/50">
+              <thead className="bg-[#1E293B]/50 backdrop-blur-lg text-4xl uppercase border-b border-slate-700/50">
                 <tr>
-                  <th className="px-4 py-4 font-semibold text-3xl">Tarih</th>
-                  <th className="px-4 py-4 font-semibold text-3xl">Saat</th>
-                  <th className="px-4 py-4 font-semibold text-3xl">Uçuş</th>
-                  <th className="px-4 py-4 font-semibold text-3xl">{showDepartures ? 'Varış Noktası' : 'Kalkış Noktası'}</th>
-                  <th className="px-4 py-4 font-semibold text-3xl">Havayolu</th>
-                  <th className="px-4 py-4 font-semibold text-3xl">Durum</th>
+                  <th className="px-6 py-8 font-semibold text-4xl">Tarih</th>
+                  <th className="px-6 py-8 font-semibold text-4xl">Saat</th>
+                  <th className="px-6 py-8 font-semibold text-4xl">Uçuş</th>
+                  <th className="px-6 py-8 font-semibold text-4xl">{showDepartures ? 'Varış Noktası' : 'Kalkış Noktası'}</th>
+                  <th className="px-6 py-8 font-semibold text-4xl">Havayolu</th>
+                  <th className="px-6 py-8 font-semibold text-4xl">Durum</th>
                 </tr>
               </thead>
               {/* Tablo içeriği - Uçuş listesi */}
-              <tbody className="text-3xl divide-y-2 divide-slate-700/50">
+              <tbody className="text-4xl divide-y-2 divide-slate-700/50">
                 {currentFlights.map((flight) => (
                   <tr 
                     key={`${flight.flight}-${flight.time}`}
                     className="bg-[#1E293B]/10 backdrop-blur-sm transition-colors hover:bg-[#1E293B]/30"
                   >
-                    <td className="px-4 py-6 text-slate-400">{flight.date}</td>
-                    <td className="px-4 py-6 text-slate-100 font-medium">{flight.time}</td>
-                    <td className="px-4 py-6 font-semibold text-sky-400">{flight.flight}</td>
-                    <td className="px-4 py-6 text-slate-100">{flight.destination}</td>
-                    <td className="px-4 py-6 text-slate-200">
+                    <td className="px-6 py-8 text-slate-400">{flight.date}</td>
+                    <td className="px-6 py-8 text-slate-100 font-medium">{flight.time}</td>
+                    <td className="px-6 py-8 font-semibold text-sky-400">{flight.flight}</td>
+                    <td className="px-6 py-8 text-slate-100">{flight.destination || flight.origin}</td>
+                    <td className="px-6 py-8 text-slate-200">
                       {/* Havayolu logosu ve ismi */}
                       <div className="flex items-center gap-3">
                         <img 
@@ -183,7 +182,7 @@ function App() {
                       </div>
                     </td>
                     {/* Uçuş durumu - Duruma göre renk değişir */}
-                    <td className={`px-4 py-6 font-medium ${getStatusColor(flight.status)}`}>
+                    <td className={`px-6 py-8 font-medium ${getStatusColor(flight.status)}`}>
                       {flight.status}
                     </td>
                   </tr>
