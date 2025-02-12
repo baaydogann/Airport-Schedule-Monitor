@@ -1,5 +1,5 @@
 // Gerekli React hook'ları ve bileşenleri import edilir
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plane, PlaneLanding, PlaneTakeoff } from 'lucide-react';
 import type { FlightData } from './types';
 import { fetchFlights } from './services/flightService';
@@ -20,6 +20,56 @@ function App() {
   const [isLoading, setIsLoading] = useState(true); // Yükleme durumunu kontrol eder
   const [error, setError] = useState<string | null>(null); // Hata mesajlarını tutar
   const [lastUpdate, setLastUpdate] = useState('');
+
+  // Uçuş verilerini yükleme fonksiyonu
+  const loadFlights = async () => {
+    try {
+      setError(null);
+      setIsLoading(true);
+      const data = await fetchFlights();
+      setFlightData(data);
+      setLastUpdate(new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false }));
+      setIsLoading(false);
+    } catch (err) {
+      setError('Uçuş verileri yüklenirken bir hata oluştu.');
+      setIsLoading(false);
+    }
+  };
+
+  // 12 saatte bir sayfayı yenileme efekti
+  useEffect(() => {
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000; // 12 saat (milisaniye cinsinden)
+    
+    // Sayfa yüklenme zamanını localStorage'a kaydet
+    const pageLoadTime = Date.now();
+    localStorage.setItem('pageLoadTime', pageLoadTime.toString());
+
+    const checkAndReload = () => {
+      const lastLoadTime = parseInt(localStorage.getItem('pageLoadTime') || '0');
+      const now = Date.now();
+      
+      // 12 saat geçmiş mi kontrol et
+      if (now - lastLoadTime >= TWELVE_HOURS) {
+        window.location.reload();
+      }
+    };
+
+    // Her dakika kontrol et
+    const interval = setInterval(checkAndReload, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // 5 dakikada bir veri güncelleme efekti
+  useEffect(() => {
+    // İlk yükleme
+    loadFlights();
+
+    // Her 5 dakikada bir güncelle
+    const interval = setInterval(loadFlights, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Saat güncelleme efekti - Her saniye çalışır
   useEffect(() => {
@@ -45,37 +95,6 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Uçuş verilerini yükleme efekti - İlk yüklemede ve her 5 dakikada bir çalışır
-  useEffect(() => {
-    let mounted = true;
-
-    const loadFlights = async () => {
-      try {
-        setError(null);
-        setIsLoading(true);
-        const data = await fetchFlights();
-        if (mounted) {
-          setFlightData(data);
-          setLastUpdate(new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false }));
-          setIsLoading(false);
-        }
-      } catch (err) {
-        if (mounted) {
-          setError('Uçuş verileri yüklenirken bir hata oluştu.');
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadFlights();
-    const interval = setInterval(loadFlights, 300000); // 5 dakika (300000 ms)
-    
-    return () => {
-      mounted = false;
-      clearInterval(interval);
-    };
-  }, []);
-
   // Uçuş durumuna göre renk belirleme fonksiyonu
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -93,7 +112,15 @@ function App() {
   };
 
   // Gösterilecek uçuşları belirle (kalkış veya varış)
-  const currentFlights = showDepartures ? flightData.departures : flightData.arrivals;
+  const currentFlights = useMemo(() => {
+    const flights = showDepartures ? flightData.departures : flightData.arrivals;
+    // Duplicate kontrolü için flight ve time'ı birleştirerek unique key oluştur
+    const uniqueFlights = Array.from(new Map(
+      flights.map(flight => [`${flight.flight}-${flight.time}`, flight])
+    ).values());
+    
+    return uniqueFlights;
+  }, [showDepartures, flightData]);
 
   return (
     // Ana container - Gradient arka plan ve font ayarları

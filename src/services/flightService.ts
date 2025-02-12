@@ -5,7 +5,7 @@ interface CacheItem {
   timestamp: number;
 }
 
-const CACHE_DURATION = 10 * 60 * 1000; // 10 dakika
+const CACHE_DURATION = 2 * 60 * 1000; // 2 dakika
 let cache: CacheItem | null = null;
 
 const headers = new Headers({
@@ -28,10 +28,25 @@ const isCacheValid = (): boolean => {
   return cache !== null && Date.now() - cache.timestamp < CACHE_DURATION;
 };
 
-const getFlightStatus = (status: string): string => {
-  switch (status) {
-    case 'SCHEDULED':
-      return 'Planlandı';
+const getFlightStatus = (status: string, estimatedTime: string | null, scheduledTime: string): string => {
+  const now = new Date();
+  const scheduled = new Date(scheduledTime);
+  
+  // Zaman farkını dakika cinsinden hesapla
+  const timeDiffMinutes = Math.floor((now.getTime() - scheduled.getTime()) / (1000 * 60));
+  
+  // Eğer tahmini zaman varsa, onu kullan
+  if (estimatedTime) {
+    const estimated = new Date(estimatedTime);
+    const estimatedDiffMinutes = Math.floor((now.getTime() - estimated.getTime()) / (1000 * 60));
+    
+    if (estimatedDiffMinutes >= 0) {
+      return 'Uçuşta';
+    }
+  }
+
+  // Status kontrolü
+  switch (status?.toUpperCase()) {
     case 'CANCELLED':
       return 'İptal';
     case 'DELAYED':
@@ -40,7 +55,17 @@ const getFlightStatus = (status: string): string => {
       return 'Uçuşta';
     case 'LANDED':
       return 'İndi';
+    case 'SCHEDULED':
     default:
+      // Eğer planlanan zamandan 15 dakika veya daha fazla geçtiyse
+      if (timeDiffMinutes >= 15) {
+        return 'Uçuşta';
+      }
+      // Planlanan zamana 30 dakika veya daha az kaldıysa
+      else if (timeDiffMinutes >= -30 && timeDiffMinutes < 15) {
+        return 'Kapı Kapanıyor';
+      }
+      // Diğer durumlar
       return 'Planlandı';
   }
 };
@@ -48,7 +73,7 @@ const getFlightStatus = (status: string): string => {
 const formatFlightTime = (timeStr: string): { date: string; time: string } => {
   const date = new Date(timeStr);
   return {
-    date: date.toLocaleDateString('tr-TR'),
+    date: date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }),
     time: date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false })
   };
 };
@@ -66,12 +91,12 @@ const formatFlights = (flights: SkyscannerResponse['arrivals'], isDeparture: boo
   
   return flights
     .map(flight => {
-      const { date, time } = formatFlightTime(
-        isDeparture 
-          ? flight.localisedScheduledDepartureTime 
-          : flight.localisedScheduledArrivalTime
-      );
+      const scheduledTime = isDeparture ? flight.localisedScheduledDepartureTime : flight.localisedScheduledArrivalTime;
+      const estimatedTime = isDeparture ? flight.localisedEstimatedDepartureTime : flight.localisedEstimatedArrivalTime;
+      const { date, time } = formatFlightTime(scheduledTime);
       
+      const flightStatus = getFlightStatus(flight.status, estimatedTime, scheduledTime);
+
       return {
         date,
         time,
@@ -79,11 +104,17 @@ const formatFlights = (flights: SkyscannerResponse['arrivals'], isDeparture: boo
         destination: isDeparture ? flight.arrivalAirportName : flight.departureAirportName,
         airline: flight.airlineName,
         airlineId: flight.airlineId,
-        status: getFlightStatus(flight.status)
+        status: flightStatus
       };
     })
     .filter(flight => flight !== null) as Flight[];
 };
+
+const clearCache = () => {
+  cache = null;
+};
+
+setInterval(clearCache, CACHE_DURATION);
 
 export const fetchFlights = async (): Promise<FlightData> => {
   if (isCacheValid() && cache) {
@@ -122,7 +153,6 @@ export const fetchFlights = async (): Promise<FlightData> => {
 
     return flightData;
   } catch (error) {
-    console.error('Uçuş verileri alınırken hata:', error);
     throw new Error('Uçuş verileri alınamadı');
   }
 };
