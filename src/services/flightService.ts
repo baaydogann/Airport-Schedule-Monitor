@@ -61,10 +61,6 @@ const getFlightStatus = (status: string, estimatedTime: string | null, scheduled
       if (timeDiffMinutes >= 15) {
         return 'Uçuşta';
       }
-      // Planlanan zamana 30 dakika veya daha az kaldıysa
-      else if (timeDiffMinutes >= -30 && timeDiffMinutes < 15) {
-        return 'Kapı Kapanıyor';
-      }
       // Diğer durumlar
       return 'Planlandı';
   }
